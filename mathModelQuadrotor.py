@@ -63,10 +63,10 @@ class MatModelQuadrotor:
         self.angularVelocity[2] = lastStateVector.YawRate
 
         momentsThrustRotors = np.zeros(3, dtype=float)
-        normalizeVector = np.array([[0], [0], [1]])
+        normalizeVector = np.array([[0], [0], [1]], dtype=float)
         inertialTensor = np.matrix([[self.paramsQuadrotor['Ixx'], 0, 0],
                                     [0, self.paramsQuadrotor['Iyy'], 0],
-                                    [0, 0, self.paramsQuadrotor['Izz']]])
+                                    [0, 0, self.paramsQuadrotor['Izz']]], dtype=float)
         sumRotorsAngularVelocity = 0
         
         for i in range(self.paramsQuadrotor['numberOfRotors']):
