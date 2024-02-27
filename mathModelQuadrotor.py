@@ -48,9 +48,9 @@ class MatModelQuadrotor:
         lastStateVector.Roll = self.reset(lastStateVector.Roll) 
         lastStateVector.Yaw = self.reset(lastStateVector.Yaw)
 
-        lastStateVector.PitchRate = self.reset(lastStateVector.PitchRate) 
-        lastStateVector.RollRate = self.reset(lastStateVector.RollRate) 
-        lastStateVector.YawRate = self.reset(lastStateVector.YawRate)
+        # lastStateVector.PitchRate = self.reset(lastStateVector.PitchRate) 
+        # lastStateVector.RollRate = self.reset(lastStateVector.RollRate) 
+        # lastStateVector.YawRate = self.reset(lastStateVector.YawRate)
 # 
 
 
@@ -73,12 +73,13 @@ class MatModelQuadrotor:
             sumRotorsAngularVelocity += rotorsAngularVelocity[i][0]**2
         print("rotorsAngularVelocity ", rotorsAngularVelocity)
         momentsThrustRotors[0] = self.paramsQuadrotor['lengthOfFlyerArms'] * self.paramsQuadrotor['motorThrustCoef'] * \
-            (rotorsAngularVelocity[0]**2 - rotorsAngularVelocity[2]**2)
+            (rotorsAngularVelocity[0][0]**2 - rotorsAngularVelocity[2][0]**2)
         momentsThrustRotors[1] = self.paramsQuadrotor['lengthOfFlyerArms'] * self.paramsQuadrotor['motorThrustCoef'] * \
-            (rotorsAngularVelocity[3]**2 - rotorsAngularVelocity[1]**2)
+            (rotorsAngularVelocity[3][0]**2 - rotorsAngularVelocity[1][0]**2)
         momentsThrustRotors[2] = self.paramsQuadrotor['motorThrustCoef'] * \
-            (rotorsAngularVelocity[3]**2 + rotorsAngularVelocity[1]**2 - \
-                rotorsAngularVelocity[0]**2 - rotorsAngularVelocity[2]**2)
+            (rotorsAngularVelocity[3][0]**2 + rotorsAngularVelocity[1][0]**2 - \
+                rotorsAngularVelocity[0][0]**2 - rotorsAngularVelocity[2][0]**2)
+        
         print(momentsThrustRotors)
         Pi = self.paramsQuadrotor['motorThrustCoef']*sumRotorsAngularVelocity
        
@@ -98,9 +99,8 @@ class MatModelQuadrotor:
         return result
 
     def reset(self, anngularValue):
-        if anngularValue > 6.28318530718:
-            anngularValue = 0
-        return anngularValue  
+        result = anngularValue % 6.28318530718
+        return result  
         
 
 
@@ -109,21 +109,8 @@ class MatModelQuadrotor:
 
 # m = MatModelQuadrotor(data)
 # sv = StateVector()
-# res = m.calculateStateVector(sv, np.array([200, 200, 200, 200]))
+# res = m.calculateStateVector(sv, np.array([[2002], [2002], [2002], [2002]]))
 # 
-# print("Положение ЛА в стартовой СК",
-                #  res.X,
-                #  res.Y,
-                #  res.Z,
-                #  res.VelX,
-                #  res.VelY,
-                #  res.VelZ,
-                #  res.Pitch,
-                #  res.Roll,
-                #  res.Yaw,
-                #  res.PitchRate,
-                #  res.RollRate,
-                #  res.YawRate,
-                #  res.timeStamp, sep='\n')
-
+# re = m.reset(23)
+# print(re)
 
