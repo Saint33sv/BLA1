@@ -20,7 +20,6 @@ class Simulator:
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         time = 0
-        print(self.controlModel.angPosZ)
         while (time <= self.Tend):
 
             self.stateVector.timeStamp = time
