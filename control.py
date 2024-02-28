@@ -98,8 +98,8 @@ class ControlSystem:
         self.PIDPosY = PID(self.desPositionY, self.pk_p_y, self.pk_i_y, self.pk_d_y)
         self.PIDPosZ = PID(self.desPositionZ, self.pk_p_z, self.pk_i_z, self.pk_d_z)
 
-        self.maxAngAccel = 25
-        self.maxAngVelosity = 1
+        self.maxAngAccel = 25.0
+        self.maxAngVelosity = 1.0
         self.maxAngPosition = 0.5
         self.limitRotorVelositi = 2631
 
@@ -166,7 +166,7 @@ class ControlSystem:
             inputVal = 0
 
         return inputVal
-con = ControlSystem()
-con.sed_desired_posotion(100.0, 25.0, 27.0)
-con.PID_Position(26, 10, 10, 0.5, 0.01)
-print(con.angPosZ)
+# con = ControlSystem()
+# con.sed_desired_posotion(100.0, 25.0, 27.0)
+# con.PID_Position(26, 10, 10, 0.5, 0.01)
+# print(con.angPosZ)

@@ -83,9 +83,9 @@ class MatModelQuadrotor:
         print(momentsThrustRotors)
         Pi = self.paramsQuadrotor['motorThrustCoef']*sumRotorsAngularVelocity
        
-        acceleration = (1/self.paramsQuadrotor['mass']) * (rotationMatrix(lastStateVector.VelX,
-                                                                       lastStateVector.VelY,
-                                                                       lastStateVector.VelZ) @ \
+        acceleration = (1/self.paramsQuadrotor['mass']) * (rotationMatrix(lastStateVector.Pitch,
+                                                                       lastStateVector.Roll,
+                                                                       lastStateVector.Yaw) @ \
             (Pi*normalizeVector)) + self.g*normalizeVector
         
         angularAcceleration = inertialTensor.I * (momentsThrustRotors - np.cross(self.angularVelocity,
@@ -104,13 +104,13 @@ class MatModelQuadrotor:
         
 
 
-# with open(r"config/quadModelConfig.yaml", 'r') as file:
-    # data = yaml.safe_load(file)
-
-# m = MatModelQuadrotor(data)
-# sv = StateVector()
-# res = m.calculateStateVector(sv, np.array([[2002], [2002], [2002], [2002]]))
+with open(r"config/quadModelConfig.yaml", 'r') as file:
+    data = yaml.safe_load(file)
 # 
-# re = m.reset(23)
-# print(re)
+m = MatModelQuadrotor(data)
+sv = StateVector()
+res = m.calculateStateVector(sv, np.array([[2002], [2002], [2002], [2002]]))
+
+re = m.reset(23)
+print(res.X)
 
