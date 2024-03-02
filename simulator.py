@@ -1,6 +1,7 @@
 import socket
 import struct
 import time as t
+from matplotlib import pyplot as plt
 
 
 class Simulator:
@@ -10,6 +11,9 @@ class Simulator:
         self.mathModel = mathModel
         self.controlModel = controlModel
         self.stateVector = stateVector
+        self.accList = []
+        self.velList = []
+        self.posList = []
 
     def run(self):
         host = '127.0.0.1'
@@ -58,7 +62,8 @@ class Simulator:
                  self.stateVector.YawRate,
                  'Метка времени симуляции',
                  self.stateVector.timeStamp, sep='\n')
-            
+        
+
             self.controlModel.PID_Position(self.stateVector.X, self.stateVector.Y, self.stateVector.Z, self.stateVector.Yaw, self.dt)
             self.controlModel.PID_angularPosition(self.stateVector.Pitch, self.stateVector.Roll, self.stateVector.Yaw, self.dt)
             self.controlModel.PID_angularVelositi(self.stateVector.PitchRate, self.stateVector.RollRate, self.stateVector.YawRate, self.dt)
@@ -72,3 +77,5 @@ class Simulator:
 
 
         udp_socket.close()
+    
+    

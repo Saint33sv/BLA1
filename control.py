@@ -15,8 +15,8 @@ class PID:
         self.integral = 0.0
 
     def run(self, currentValue, dt, controlLimit):
-        print("Текущее значение-- ", currentValue)
-        print("Целевое значение---- ", self.desiredValue)
+        # print("Текущее значение-- ", currentValue)
+        # print("Целевое значение---- ", self.desiredValue)
         # print("Коефициенты ---", self.kp, self.ki, self.kd, sep=', ')
         self.error = self.desiredValue - currentValue
         self.integral += self.error * dt
@@ -24,7 +24,7 @@ class PID:
             self.kd * ((self.error - self.errorPast) / dt)
         self.errorPast = self.error
         value = self.saturation(value, controlLimit)
-        print('Вычислинное значение --- ', value)
+        # print('Вычислинное значение --- ', value)
 
         return value
 
@@ -87,13 +87,13 @@ class ControlSystem:
         self.posdesZ = 0.0
         self.pk_p_x = 0.3
         self.pk_p_y = 0.25
-        self.pk_p_z = 400.0
+        self.pk_p_z = 400
         self.pk_i_x = 0.001
         self.pk_i_y = 0.001
-        self.pk_i_z = 50.0 
+        self.pk_i_z = 50
         self.pk_d_x = 0.47
         self.pk_d_y = 0.47
-        self.pk_d_z = 300.0
+        self.pk_d_z = 300
         self.PIDPosX = PID(self.desPositionX, self.pk_p_x, self.pk_i_x, self.pk_d_x)
         self.PIDPosY = PID(self.desPositionY, self.pk_p_y, self.pk_i_y, self.pk_d_y)
         self.PIDPosZ = PID(self.desPositionZ, self.pk_p_z, self.pk_i_z, self.pk_d_z)
@@ -109,7 +109,7 @@ class ControlSystem:
         self.desPositionZ = Z
 
     def PID_angularVelositi(self, cur_ang_vel_x, cur_ang_vel_y, cur_ang_vel_z, dt):
-        print('---------------Контур угловых скоростей--------------')
+        # print('---------------Контур угловых скоростей--------------')
         self.PIDangVelX.desiredValue = self.angVelX
         self.PIDangVelY.desiredValue = self.angVelY
         self.PIDangVelZ.desiredValue = self.angVelZ
@@ -118,7 +118,7 @@ class ControlSystem:
         self.angaccelZ = self.PIDangVelZ.run(cur_ang_vel_z, dt, self.maxAngAccel)
         
     def PID_angularPosition(self, cur_ang_pos_x, cur_ang_pos_y, cur_ang_pos_z, dt):
-        print('---------------Контур угловых положений--------------')
+        # print('---------------Контур угловых положений--------------')
         self.PIDangPosX.desiredValue = self.angPosX
         self.PIDangPosY.desiredValue = self.angPosY
         self.PIDangPosZ.desiredValue = self.angPosZ
@@ -127,7 +127,7 @@ class ControlSystem:
         self.angVelZ = self.PIDangPosZ.run(cur_ang_pos_z, dt, self.maxAngVelosity)
 
     def PID_Position(self, cur_pos_x, cur_pos_y, cur_pos_z, cur_ang_pos_z, dt):
-        print('---------------Контур положений в СК--------------')
+        # print('---------------Контур положений в СК--------------')
         self.PIDPosX.desiredValue = self.desPositionX
         self.PIDPosY.desiredValue = self.desPositionY
         self.PIDPosZ.desiredValue = self.desPositionZ        
@@ -144,6 +144,7 @@ class ControlSystem:
         self.angPosY = np.array(res_xy)[0][1]
                 
     def mixer(self):
+        print(self.posdesZ, self.angaccelX, self.angaccelY, self.angaccelZ, sep='\t')
         m1 = self.posdesZ + self.angaccelX - self.angaccelZ
         m2 = self.posdesZ - self.angaccelY + self.angaccelZ
         m3 = self.posdesZ - self.angaccelX - self.angaccelZ
@@ -166,7 +167,7 @@ class ControlSystem:
             inputVal = 0
 
         return inputVal
-# con = ControlSystem()
-# con.sed_desired_posotion(100.0, 25.0, 27.0)
-# con.PID_Position(26, 10, 10, 0.5, 0.01)
-# print(con.angPosZ)
+
+# pid = PID(100, 0, 0, 0)
+# res = pid.run(0, 0.01, 20)
+# print(res)

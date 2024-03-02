@@ -72,25 +72,28 @@ class MatModelQuadrotor:
         for i in range(self.paramsQuadrotor['numberOfRotors']):
             sumRotorsAngularVelocity += rotorsAngularVelocity[i][0]**2
         print("rotorsAngularVelocity ", rotorsAngularVelocity)
-        momentsThrustRotors[0] = self.paramsQuadrotor['lengthOfFlyerArms'] * self.paramsQuadrotor['motorThrustCoef'] * \
+        momentsThrustRotors[0] = (self.paramsQuadrotor['lengthOfFlyerArms'] * self.paramsQuadrotor['motorThrustCoef']) * \
             (rotorsAngularVelocity[0][0]**2 - rotorsAngularVelocity[2][0]**2)
-        momentsThrustRotors[1] = self.paramsQuadrotor['lengthOfFlyerArms'] * self.paramsQuadrotor['motorThrustCoef'] * \
+        momentsThrustRotors[1] = (self.paramsQuadrotor['lengthOfFlyerArms'] * self.paramsQuadrotor['motorThrustCoef']) * \
             (rotorsAngularVelocity[3][0]**2 - rotorsAngularVelocity[1][0]**2)
-        momentsThrustRotors[2] = self.paramsQuadrotor['motorThrustCoef'] * \
+        momentsThrustRotors[2] = self.paramsQuadrotor['motorResistCoef'] * \
             (rotorsAngularVelocity[3][0]**2 + rotorsAngularVelocity[1][0]**2 - \
                 rotorsAngularVelocity[0][0]**2 - rotorsAngularVelocity[2][0]**2)
         
-        print(momentsThrustRotors)
+        
         Pi = self.paramsQuadrotor['motorThrustCoef']*sumRotorsAngularVelocity
-       
+              
         acceleration = (1/self.paramsQuadrotor['mass']) * (rotationMatrix(lastStateVector.Pitch,
                                                                        lastStateVector.Roll,
                                                                        lastStateVector.Yaw) @ \
-            (Pi*normalizeVector)) + self.g*normalizeVector
+            (Pi*normalizeVector)) - self.g*normalizeVector
+        
         
         angularAcceleration = inertialTensor.I * (momentsThrustRotors - np.cross(self.angularVelocity,
                                                         inertialTensor @ self.angularVelocity)).T
-        # print(angularAcceleration)
+        
+
+        
         result = np.zeros(6, dtype=float)
         for i in range(3):
             result[i] = acceleration[i]
@@ -101,16 +104,3 @@ class MatModelQuadrotor:
     def reset(self, anngularValue):
         result = anngularValue % 6.28318530718
         return result  
-        
-
-
-with open(r"config/quadModelConfig.yaml", 'r') as file:
-    data = yaml.safe_load(file)
-# 
-m = MatModelQuadrotor(data)
-sv = StateVector()
-res = m.calculateStateVector(sv, np.array([[2002], [2002], [2002], [2002]]))
-
-re = m.reset(23)
-print(res.X)
-
