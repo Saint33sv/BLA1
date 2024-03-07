@@ -86,7 +86,7 @@ class MatModelQuadrotor:
         acceleration = (1/self.paramsQuadrotor['mass']) * (rotationMatrix(lastStateVector.Pitch,
                                                                        lastStateVector.Roll,
                                                                        lastStateVector.Yaw) @ \
-            (Pi*normalizeVector)) - self.g*normalizeVector
+            (Pi*normalizeVector)) #- self.g*normalizeVector
         
         
         angularAcceleration = inertialTensor.I * (momentsThrustRotors - np.cross(self.angularVelocity,

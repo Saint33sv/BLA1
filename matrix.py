@@ -27,14 +27,14 @@ def rotationMatrix(p, r, y):
     # roll = math.radians(r)
     # yaw = math.radians(y)
 
-    R = Rz(y) * Ry(p) * Rx(r)
+    R = Rz(y) @ Ry(p) @ Rx(r)
     return R
 
 
-# m = rotationMatrix(0.0, 0.0, 0.0)
+# m = rotationMatrix(0.0, 0.0, math.radians(90.0))
 # x = np.array([[1], [0], [0]])
-# x_res = m*x
-# print(x_res)
+# x_res = np.matmul(m, x, out=None)
+# print(m)
 
 
 
