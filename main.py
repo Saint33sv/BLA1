@@ -12,7 +12,7 @@ with open(r"config/quadModelConfig.yaml", 'r') as file:
 stateVector = StateVector()
 mathModel = MatModelQuadrotor(paramsQuadrotor)
 controlSystem = ControlSystem()
-controlSystem.sed_desired_posotion(5.0, 5.0, 10.0)
+controlSystem.sed_desired_posotion(0.0, 0.0, 10.0)
 
 simulator = Simulator(paramsQuadrotor['simulationTotalTime'], paramsQuadrotor['simulationStep'], mathModel, controlSystem, stateVector)
 simulator.run()

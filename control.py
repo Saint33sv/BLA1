@@ -3,7 +3,6 @@ import numpy as np
 from matrix import *
 
 
-
 class PID:
     def __init__(self, desiredValue, kp, ki, kd):
         self.desiredValue = desiredValue
@@ -14,31 +13,16 @@ class PID:
         self.errorPast = 0.0
         self.integral = 0.0
 
-    def run(self, currentValue, dt, controlLimit):
+    def run(self, currentValue, dt):
         # print("Текущее значение-- ", currentValue)
         # print("Целевое значение---- ", self.desiredValue)
         # print("Коефициенты ---", self.kp, self.ki, self.kd, sep=', ')
         self.error = self.desiredValue - currentValue
         self.integral += self.error * dt
-        value = self.kp * self.error + self.ki * self.integral + \
-            self.kd * ((self.error - self.errorPast) / dt)
+        value = self.kp * self.error + self.ki * self.integral + self.kd * ((self.error - self.errorPast) / dt)
+        print(f"{self.kp} * {self.error} + {self.ki} * {self.integral} + {self.kd} * (({self.error} - {self.errorPast}) / {dt}) = {value}")
         self.errorPast = self.error
-        value = self.saturation(value, controlLimit)
-        # print('Вычислинное значение --- ', value)
-
         return value
-
-    def saturation(self, inputVal, controlLimit):
-        # Звено насыщения ограничивает размер входного параметра
-        # На выходе метода,абсолютное значение не может быть больше
-        # заданного предела controlLimit
-        if inputVal > controlLimit:
-            inputVal = controlLimit
-        elif inputVal < -controlLimit:
-            inputVal = -controlLimit
-
-        return inputVal
-
 
 
 class ControlSystem:
@@ -109,31 +93,39 @@ class ControlSystem:
         self.desPositionZ = Z
 
     def PID_angularVelositi(self, cur_ang_vel_x, cur_ang_vel_y, cur_ang_vel_z, dt):
-        # print('---------------Контур угловых скоростей--------------')
+        print('---------------Контур угловых скоростей--------------')
         self.PIDangVelX.desiredValue = self.angVelX
         self.PIDangVelY.desiredValue = self.angVelY
         self.PIDangVelZ.desiredValue = self.angVelZ
-        self.angaccelX = self.PIDangVelX.run(cur_ang_vel_x, dt, self.maxAngAccel)
-        self.angaccelY = self.PIDangVelY.run(cur_ang_vel_y, dt, self.maxAngAccel)
-        self.angaccelZ = self.PIDangVelZ.run(cur_ang_vel_z, dt, self.maxAngAccel)
+        self.angaccelX = self.PIDangVelX.run(cur_ang_vel_x, dt)
+        self.angaccelY = self.PIDangVelY.run(cur_ang_vel_y, dt)
+        self.angaccelZ = self.PIDangVelZ.run(cur_ang_vel_z, dt)
+        self.angaccelX = self.saturation(self.angaccelX, self.maxAngAccel)
+        self.angaccelY = self.saturation(self.angaccelY, self.maxAngAccel)
+        self.angaccelZ = self.saturation(self.angaccelZ, self.maxAngAccel)
         
     def PID_angularPosition(self, cur_ang_pos_x, cur_ang_pos_y, cur_ang_pos_z, dt):
-        # print('---------------Контур угловых положений--------------')
+        print('---------------Контур угловых положений--------------')
         self.PIDangPosX.desiredValue = self.angPosX
         self.PIDangPosY.desiredValue = self.angPosY
         self.PIDangPosZ.desiredValue = self.angPosZ
-        self.angVelX = self.PIDangPosX.run(cur_ang_pos_x, dt, self.maxAngVelosity)
-        self.angVelY = self.PIDangPosY.run(cur_ang_pos_y, dt, self.maxAngVelosity)
-        self.angVelZ = self.PIDangPosZ.run(cur_ang_pos_z, dt, self.maxAngVelosity)
+        self.angVelX = self.PIDangPosX.run(cur_ang_pos_x, dt)
+        self.angVelY = self.PIDangPosY.run(cur_ang_pos_y, dt)
+        self.angVelZ = self.PIDangPosZ.run(cur_ang_pos_z, dt)
+        self.angVelX = self.saturation(self.angVelX, self.maxAngVelosity)
+        self.angVelY = self.saturation(self.angVelY, self.maxAngVelosity)
+        self.angVelZ = self.saturation(self.angVelZ, self.maxAngVelosity)
 
     def PID_Position(self, cur_pos_x, cur_pos_y, cur_pos_z, cur_ang_pos_z, dt):
-        # print('---------------Контур положений в СК--------------')
+        print('---------------Контур положений в СК--------------')
         self.PIDPosX.desiredValue = self.desPositionX
         self.PIDPosY.desiredValue = self.desPositionY
         self.PIDPosZ.desiredValue = self.desPositionZ        
-        self.angPosX = self.PIDPosX.run(cur_pos_x, dt, self.maxAngPosition)
-        self.angPosY = self.PIDPosY.run(cur_pos_y, dt, self.maxAngPosition)
-        self.posdesZ = self.PIDPosZ.run(cur_pos_z, dt, self.maxAngPosition)
+        self.angPosX = self.PIDPosX.run(cur_pos_x, dt)
+        self.angPosY = self.PIDPosY.run(cur_pos_y, dt)
+        self.posdesZ = self.PIDPosZ.run(cur_pos_z, dt)
+        self.angPosX = self.saturation(self.angPosX, self.maxAngPosition)
+        self.angPosY = self.saturation(self.angPosY, self.maxAngPosition)
         
         R = rotationMatrix(0, 0, cur_ang_pos_z)
         xy = np.zeros(3, dtype=float)
@@ -159,6 +151,18 @@ class ControlSystem:
                            [m4]], dtype=float)
         print("MIXER ----- ", result)
         return result
+    
+    def saturation(self, inputVal, controlLimit):
+        # Звено насыщения ограничивает размер входного параметра
+        # На выходе метода,абсолютное значение не может быть больше
+        # заданного предела controlLimit
+        if inputVal > controlLimit:
+            inputVal = controlLimit
+        elif inputVal < -controlLimit:
+            inputVal = -controlLimit
+
+        return inputVal
+
     
     def saturation_velosity(self, inputVal, controlLimit):
         if inputVal > controlLimit:
