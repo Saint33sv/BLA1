@@ -11,23 +11,13 @@ class Simulator:
         self.mathModel = mathModel
         self.controlModel = controlModel
         self.stateVector = stateVector
-        self.accList = []
-        self.velList = []
-        self.posList = []
+        self.host = '127.0.0.1'
+        self.port = 12346
+        self.addr = (self.host, self.port)
+        self.udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    def run(self):
-        host = '127.0.0.1'
-        port = 12346
-        addr = (host, port)
-        
-
-        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-        time = 0
-        while (time <= self.Tend):
-
-            self.stateVector.timeStamp = time
-            data = bytearray(struct.pack("ddddddddddddd",
+    def _send_pose_data(self):
+        data = bytearray(struct.pack("ddddddddddddd",
                                         self.stateVector.X,
                                         self.stateVector.Y,
                                         self.stateVector.Z,
@@ -42,7 +32,13 @@ class Simulator:
                                         self.stateVector.YawRate,
                                         self.stateVector.timeStamp
                                         ))
-            udp_socket.sendto(data, addr)
+        self.udp_socket.sendto(data, self.addr)
+
+    def run(self):
+        time = 0
+        while (time <= self.Tend):
+
+            self.stateVector.timeStamp = time
             
             print("Положение ЛА в стартовой СК",
                  self.stateVector.X,
@@ -63,12 +59,12 @@ class Simulator:
                  'Метка времени симуляции',
                  self.stateVector.timeStamp, sep='\n')
         
-
             self.controlModel.PID_Position(self.stateVector.X, self.stateVector.Y, self.stateVector.Z, self.stateVector.Yaw, self.dt)
             self.controlModel.PID_angularPosition(self.stateVector.Pitch, self.stateVector.Roll, self.stateVector.Yaw, self.dt)
             self.controlModel.PID_angularVelositi(self.stateVector.PitchRate, self.stateVector.RollRate, self.stateVector.YawRate, self.dt)
             rotorsAngularVelositis = self.controlModel.mixer()
             self.stateVector = self.mathModel.calculateStateVector(self.stateVector, rotorsAngularVelositis)
+            self._send_pose_data()
             
             time += self.dt
             t.sleep(0.01)
@@ -76,6 +72,6 @@ class Simulator:
 
 
 
-        udp_socket.close()
+        self.udp_socket.close()
     
     
