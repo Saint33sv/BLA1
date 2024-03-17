@@ -127,13 +127,9 @@ class ControlSystem:
         self.angPosX = self.saturation(self.angPosX, self.maxAngPosition)
         self.angPosY = self.saturation(self.angPosY, self.maxAngPosition)
         
-        R = rotationMatrix(0, 0, cur_ang_pos_z)
-        xy = np.zeros(3, dtype=float)
-        xy[0] = self.angPosX
-        xy[1] = self.angPosY
-        res_xy = R @ xy
-        self.angPosX = np.array(res_xy)[0][0]
-        self.angPosY = np.array(res_xy)[0][1]
+        target_pitch_roll = rotation2d(cur_ang_pos_z).T @ np.array([[self.angPosY], [self.angPosX]])
+        self.angPosX = target_pitch_roll[0]
+        self.angPosY = target_pitch_roll[1]
                 
     def mixer(self):
         print(self.posdesZ, self.angaccelX, self.angaccelY, self.angaccelZ, sep='\t')

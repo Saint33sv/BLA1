@@ -8,12 +8,12 @@ class StateVector:
 	VelY = 0.0
 	VelZ = 0.0
 	# Угловое положение ЛА
-	Pitch = 0.0
 	Roll = 0.0
+	Pitch = 0.0
 	Yaw = 0.0
 	# Угловая скорость ЛА
-	PitchRate = 0.0
 	RollRate = 0.0
+	PitchRate = 0.0
 	YawRate = 0.0
 	# Метка времени симуляции
 	timeStamp = 0.0

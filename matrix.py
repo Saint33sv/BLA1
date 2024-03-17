@@ -2,39 +2,26 @@ import math
 import numpy as np
 from numpy import cos, sin 
 
-
-def Rx(alpha):
-    R = np.matrix([[1, 0, 0],
-                   [0, cos(alpha), -sin(alpha)],
-                   [0, sin(alpha), cos(alpha)]], dtype=float)
-    return R
-
-def Ry(beta):
-    R = np.matrix([[cos(beta), 0, sin(beta)],
-                   [0, 1, 0],     
-                   [-sin(beta), 0, cos(beta)]], dtype=float)
-    return R
-
-def Rz(gamma):
-    R = np.matrix([[cos(gamma), -sin(gamma), 0],
-                  [sin(gamma), cos(gamma), 0],
-                  [0, 0, 1]], dtype=float)
-    return R
+def rotation2d(theta):
+        return np.array([[np.cos(theta), -np.sin(theta)], 
+                         [np.sin(theta),  np.cos(theta)]])
 
 
-def rotationMatrix(p, r, y):
-    # pitch = math.radians(p)
-    # roll = math.radians(r)
-    # yaw = math.radians(y)
+def rotationMatrix(pitch, roll, yaw):
+	return np.array([[np.cos(yaw)*np.cos(roll), np.sin(yaw)*np.cos(roll), -np.sin(roll)],
+						[np.cos(yaw)*np.sin(pitch)*np.sin(roll) - np.sin(yaw)*np.cos(pitch),
+						  	np.sin(yaw)*np.sin(pitch)*np.sin(roll) + np.cos(yaw)*np.cos(pitch),
+							np.sin(pitch)*np.cos(roll)],
+						  [np.cos(yaw)*np.sin(roll)*np.cos(pitch) + np.sin(yaw)*np.sin(pitch),
+							np.sin(yaw)*np.cos(pitch)*np.sin(roll) - np.cos(yaw)*np.sin(pitch),
+							np.cos(pitch)*np.cos(roll)]])
 
-    R = Rz(y) @ Ry(p) @ Rx(r)
-    return R
 
 
-# m = rotationMatrix(0.0, 0.0, math.radians(90.0))
-# x = np.array([[1], [0], [0]])
-# x_res = np.matmul(m, x, out=None)
-# print(m)
+m = rotationMatrix(0.0, 0.0, math.radians(90.0))
+x = np.array([[1], [0], [0]])
+x_res = np.matmul(m, x, out=None)
+print(x_res)
 
 
 
